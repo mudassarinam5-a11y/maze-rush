@@ -1,0 +1,114 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { GameView } from "./components/GameView";
+import { DifficultyScreen, HelpScreen, LevelSelectScreen, MenuScreen, SettingsScreen } from "./components/Screens";
+import { clampLevel, getLevel } from "./game/levels";
+import { bestKey, clearSave, defaultSave, loadSave, writeSave, type SaveData } from "./game/save";
+import { setSoundEnabled, sfx } from "./game/audio";
+import type { Result } from "./game/engine";
+import { DIFFS, LEVELS_PER_DIFF, type Diff } from "./game/types";
+
+type Screen = "menu" | "difficulty" | "levels" | "settings" | "help" | "game";
+
+function useTouchMode(pref: "auto" | "on" | "off") {
+  const compute = () => {
+    if (pref === "on") return true;
+    if (pref === "off") return false;
+    return window.matchMedia?.("(pointer: coarse)").matches || window.matchMedia?.("(hover: none)").matches || Math.min(window.innerWidth, window.innerHeight) < 600;
+  };
+  const [v, setV] = useState(compute);
+  useEffect(() => {
+    const f = () => setV(compute());
+    f();
+    window.addEventListener("resize", f);
+    return () => window.removeEventListener("resize", f);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pref]);
+  return v;
+}
+
+export default function App() {
+  const [save, setSave] = useState<SaveData>(() => loadSave());
+  const [screen, setScreen] = useState<Screen>("menu");
+  const [level, setLevel] = useState(1);
+  const diff = save.settings.difficulty;
+  const showTouch = useTouchMode(save.settings.touch);
+
+  useEffect(() => writeSave(save), [save]);
+  useEffect(() => setSoundEnabled(save.settings.sound), [save.settings.sound]);
+
+  const update = useCallback((fn: (s: SaveData) => SaveData) => setSave((s) => fn(s)), []);
+  const setDifficulty = useCallback((d: Diff) => update((s) => ({ ...s, settings: { ...s.settings, difficulty: d } })), [update]);
+
+  const startLevel = useCallback((n: number) => {
+    sfx.click();
+    setLevel(clampLevel(n));
+    setScreen("game");
+  }, []);
+
+  const onComplete = useCallback(
+    (r: Result) => {
+      update((s) => {
+        const d = s.settings.difficulty;
+        const k = bestKey(d, r.level);
+        const prev = s.best[k];
+        const better = !prev || r.stars > prev.stars || (r.stars === prev.stars && r.score > prev.score);
+        return {
+          ...s,
+          unlocked: { ...s.unlocked, [d]: Math.max(s.unlocked[d], Math.min(LEVELS_PER_DIFF + 1, r.level + 1)) },
+          best: better ? { ...s.best, [k]: { stars: r.stars, time: prev ? Math.min(prev.time, r.time) : r.time, score: Math.max(prev?.score ?? 0, r.score) } } : s.best,
+          totalScore: s.totalScore + (prev ? 0 : r.score),
+        };
+      });
+    },
+    [update],
+  );
+
+  const levelData = useMemo(() => getLevel(diff, level), [diff, level]);
+  const nextDiff = DIFFS[DIFFS.indexOf(diff) + 1] as Diff | undefined;
+
+  if (screen === "game") {
+    return (
+      <GameView
+        key={`${diff}-${level}`}
+        level={levelData}
+        diff={diff}
+        soundOn={save.settings.sound}
+        shakeOn={save.settings.shake}
+        showTouch={showTouch}
+        onComplete={onComplete}
+        onNextLevel={() => startLevel(level + 1)}
+        onNextDifficulty={nextDiff ? () => { setDifficulty(nextDiff); setLevel(1); } : null}
+        onLevelSelect={() => setScreen("levels")}
+        onMenu={() => setScreen("menu")}
+        onToggleSound={() => update((s) => ({ ...s, settings: { ...s.settings, sound: !s.settings.sound } }))}
+      />
+    );
+  }
+  if (screen === "difficulty") {
+    return <DifficultyScreen save={save} onBack={() => setScreen("menu")} onPick={(d) => { setDifficulty(d); setScreen("levels"); }} />;
+  }
+  if (screen === "levels") {
+    return <LevelSelectScreen save={save} onBack={() => setScreen("menu")} onDifficulty={setDifficulty} onPick={startLevel} />;
+  }
+  if (screen === "settings") {
+    return (
+      <SettingsScreen
+        save={save}
+        onBack={() => setScreen("menu")}
+        onChange={(settings) => update((s) => ({ ...s, settings }))}
+        onReset={() => { clearSave(); setSave({ ...defaultSave(), settings: save.settings }); }}
+      />
+    );
+  }
+  if (screen === "help") return <HelpScreen onBack={() => setScreen("menu")} />;
+  return (
+    <MenuScreen
+      save={save}
+      onPlay={() => startLevel(Math.min(save.unlocked[diff], LEVELS_PER_DIFF))}
+      onDifficulty={() => setScreen("difficulty")}
+      onLevels={() => setScreen("levels")}
+      onSettings={() => setScreen("settings")}
+      onHelp={() => setScreen("help")}
+    />
+  );
+}
