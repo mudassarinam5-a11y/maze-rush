@@ -12,7 +12,8 @@ const completedCount = (save: SaveData, d: Diff) => Object.keys(save.best).filte
 const nextLevelFor = (save: SaveData, d: Diff) => Math.min(save.unlocked[d], LEVELS_PER_DIFF);
 
 // ------------------------------------------------------------------ MAIN MENU
-export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout: () => void }) {
+export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout?: () => void
+  const d = save.settings.difficulty;
   const done = completedCount(save, d);
   const all = save.unlocked[d] > LEVELS_PER_DIFF;
   const lvl = nextLevelFor(save, d);
