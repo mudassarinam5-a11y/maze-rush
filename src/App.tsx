@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GameView } from "./components/GameView";
-import { DifficultyScreen, HelpScreen, LevelSelectScreen, MenuScreen, SettingsScreen } from "./components/Screens";
+import { AboutScreen, DifficultyScreen, HelpScreen, LevelSelectScreen, MenuScreen, SettingsScreen } from "./components/Screens";
 import { clampLevel, getLevel } from "./game/levels";
 import { bestKey, clearSave, defaultSave, loadSave, writeSave, type SaveData } from "./game/save";
 import { setSoundEnabled, sfx } from "./game/audio";
 import type { Result } from "./game/engine";
 import { DIFFS, LEVELS_PER_DIFF, type Diff } from "./game/types";
 
-type Screen = "menu" | "difficulty" | "levels" | "settings" | "help" | "game";
+type Screen = "menu" | "difficulty" | "levels" | "settings" | "help" | "game" | "about";
 
 function useTouchMode(pref: "auto" | "on" | "off") {
   const compute = () => {
@@ -101,6 +101,7 @@ export default function App() {
     );
   }
   if (screen === "help") return <HelpScreen onBack={() => setScreen("menu")} />;
+  if (screen === "about") return <AboutScreen onBack={() => setScreen("menu")} />;
   return (
     <MenuScreen
       save={save}
@@ -109,6 +110,7 @@ export default function App() {
       onLevels={() => setScreen("levels")}
       onSettings={() => setScreen("settings")}
       onHelp={() => setScreen("help")}
+      onAbout={() => setScreen("about")}
     />
   );
 }
