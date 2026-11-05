@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, LayoutGrid, Settings as SettingsIcon, BookOpen, Gauge, Lock, Trophy, Sparkles, Volume2, VolumeX, Trash2, Heart, HelpCircle, CloudFog, KeyRound, Clock, Flag, ToggleLeft, ToggleRight, Swords } from "lucide-react";
+import { Play, LayoutGrid, Settings as SettingsIcon, BookOpen, Gauge, Lock, Trophy, Sparkles, Volume2, VolumeX, Trash2, Heart, HelpCircle, CloudFog, KeyRound, Clock, Flag, ToggleLeft, ToggleRight, Swords, Info } from "lucide-react";
 import { BackButton, ScreenTitle, Shell, Stars } from "./ui";
 import { DIFF_INFO, getLevel } from "../game/levels";
 import { bestKey, type SaveData } from "../game/save";
@@ -12,8 +12,7 @@ const completedCount = (save: SaveData, d: Diff) => Object.keys(save.best).filte
 const nextLevelFor = (save: SaveData, d: Diff) => Math.min(save.unlocked[d], LEVELS_PER_DIFF);
 
 // ------------------------------------------------------------------ MAIN MENU
-export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void }) {
-  const d = save.settings.difficulty;
+export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout: () => void }) {
   const done = completedCount(save, d);
   const all = save.unlocked[d] > LEVELS_PER_DIFF;
   const lvl = nextLevelFor(save, d);
@@ -71,6 +70,10 @@ export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, o
               <SettingsIcon className="h-5 w-5 shrink-0 text-slate-300" />
               <span className="font-display text-xs font-bold text-white sm:text-sm">SETTINGS</span>
             </button>
+            <button onClick={onAbout} className={`${card} col-span-2 flex items-center justify-center gap-2 px-3 py-3`}>
+  <Info className="h-5 w-5 text-cyan-300" />
+  <span className="font-display text-xs font-bold text-white sm:text-sm">ABOUT US</span>
+</button>
           </div>
           <p className="mt-1 text-center text-[11px] text-slate-500 short:hidden">Progress saves automatically in your browser · WASD / Arrows / Swipe / D-Pad</p>
         </div>
@@ -257,6 +260,63 @@ export function HelpScreen({ onBack }: { onBack: () => void }) {
             <div className="mt-0.5 text-sm text-slate-300">{d}</div>
           </div>
         ))}
+      </div>
+    </Shell>
+  );
+}
+// ------------------------------------------------------------------ ABOUT US
+export function AboutScreen({ onBack }: { onBack: () => void }) {
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="Get to know the game and its developer.">ABOUT US</ScreenTitle>
+
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+
+        <div className="rounded-2xl border border-cyan-300/30 bg-[#0c1024]/90 p-5 text-center">
+          <h3 className="font-display text-2xl font-black tracking-wide text-cyan-300">
+            MAZE RUSH
+          </h3>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            Maze Rush is an exciting maze puzzle game designed to challenge
+            your problem-solving skills and provide an enjoyable gaming
+            experience.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            The game features 80 challenging levels across four difficulty
+            modes: Easy, Normal, Hard, and Impossible. Find your way through
+            the maze and reach the exit!
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            OUR MISSION
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Our mission is to provide players with an enjoyable, engaging,
+            and challenging gaming experience while encouraging logical
+            thinking and problem-solving skills.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            DEVELOPER
+          </h3>
+          <p className="mt-2 text-base font-bold text-cyan-300">
+            Mudassir Inam
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Maze Rush is independently developed and maintained by
+            Mudassir Inam.
+          </p>
+        </div>
+
+        <p className="text-center text-xs text-slate-500">
+          Thank you for playing Maze Rush!
+        </p>
+
       </div>
     </Shell>
   );
