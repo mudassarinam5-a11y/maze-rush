@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, LayoutGrid, Settings as SettingsIcon, BookOpen, Gauge, Lock, Trophy, Sparkles, Volume2, VolumeX, Trash2, Heart, HelpCircle, CloudFog, KeyRound, Clock, Flag, ToggleLeft, ToggleRight, Swords, Info } from "lucide-react";
+import { Play, LayoutGrid, Settings as SettingsIcon, BookOpen, Gauge, Lock, Trophy, Sparkles, Volume2, VolumeX, Trash2, Heart, HelpCircle, CloudFog, KeyRound, Clock, Flag, ToggleLeft, ToggleRight, Swords, Info, ShieldCheck } from "lucide-react";
 import { BackButton, ScreenTitle, Shell, Stars } from "./ui";
 import { DIFF_INFO, getLevel } from "../game/levels";
 import { bestKey, type SaveData } from "../game/save";
@@ -12,7 +12,7 @@ const completedCount = (save: SaveData, d: Diff) => Object.keys(save.best).filte
 const nextLevelFor = (save: SaveData, d: Diff) => Math.min(save.unlocked[d], LEVELS_PER_DIFF);
 
 // ------------------------------------------------------------------ MAIN MENU
-export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout?: () => void }) {
+export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout, onPrivacy }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout?: () => void; onPrivacy?: () => void }) {
   const d = save.settings.difficulty;
   const done = completedCount(save, d);
   const all = save.unlocked[d] > LEVELS_PER_DIFF;
@@ -72,9 +72,13 @@ export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, o
               <span className="font-display text-xs font-bold text-white sm:text-sm">SETTINGS</span>
             </button>
             <button onClick={onAbout} className={`${card} col-span-2 flex items-center justify-center gap-2 px-3 py-3`}>
-  <Info className="h-5 w-5 text-cyan-300" />
-  <span className="font-display text-xs font-bold text-white sm:text-sm">ABOUT US</span>
-</button>
+              <Info className="h-5 w-5 text-cyan-300" />
+              <span className="font-display text-xs font-bold text-white sm:text-sm">ABOUT US</span>
+            </button>
+            <button onClick={onPrivacy} className={`${card} col-span-2 flex items-center justify-center gap-2 px-3 py-3`}>
+              <ShieldCheck className="h-5 w-5 text-cyan-300" />
+              <span className="font-display text-xs font-bold text-white sm:text-sm">PRIVACY POLICY</span>
+            </button>
           </div>
           <p className="mt-1 text-center text-[11px] text-slate-500 short:hidden">Progress saves automatically in your browser · WASD / Arrows / Swipe / D-Pad</p>
         </div>
@@ -265,6 +269,7 @@ export function HelpScreen({ onBack }: { onBack: () => void }) {
     </Shell>
   );
 }
+
 // ------------------------------------------------------------------ ABOUT US
 export function AboutScreen({ onBack }: { onBack: () => void }) {
   return (
@@ -311,6 +316,124 @@ export function AboutScreen({ onBack }: { onBack: () => void }) {
           <p className="mt-2 text-sm leading-relaxed text-slate-300">
             Maze Rush is independently developed and maintained by
             Mudassir Inam.
+          </p>
+        </div>
+
+        <p className="text-center text-xs text-slate-500">
+          Thank you for playing Maze Rush!
+        </p>
+
+      </div>
+    </Shell>
+  );
+}
+
+// ------------------------------------------------------------------ PRIVACY POLICY
+export function PrivacyPolicyScreen({ onBack }: { onBack: () => void }) {
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="How Maze Rush handles game data and privacy.">PRIVACY POLICY</ScreenTitle>
+
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+
+        <p className="text-xs text-slate-500">
+          Last updated: November 6, 2026
+        </p>
+
+        <div className="rounded-2xl border border-cyan-300/30 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-cyan-300">
+            1. INTRODUCTION
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Welcome to Maze Rush. This Privacy Policy explains how the
+            Maze Rush game handles information when you visit and play
+            our browser-based game.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            2. PERSONAL INFORMATION
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Maze Rush does not require you to create an account or
+            provide personal details to play the game.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            3. GAME DATA AND LOCAL STORAGE
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Maze Rush uses your browser's Local Storage to save game
+            progress and settings on your device. This may include
+            unlocked levels, best results such as stars, completion
+            times and scores, total score, sound preferences,
+            difficulty settings, screen shake settings and touch controls.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            This information helps the game remember your progress
+            and preferences. Clearing your browser's site data or
+            changing your device or browser may remove or reset
+            your saved progress.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            4. THIRD-PARTY SERVICES
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            The Maze Rush website is hosted by Netlify. The hosting
+            provider may process technical information when visitors
+            access the website. Please review Netlify's own privacy
+            policy to understand its data practices.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            5. DATA SECURITY
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Game progress is stored in your browser on your device.
+            We recommend keeping your browser and device updated
+            and using them securely.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            6. CHILDREN'S PRIVACY
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Maze Rush does not require players to submit personal
+            information or create an account to play.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            7. CHANGES TO THIS POLICY
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            We may update this Privacy Policy when the game or its
+            services change. Any updates will be published on this page.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+          <h3 className="font-display text-lg font-bold text-white">
+            8. CONTACT
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            Developer: Mudassir Inam
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            For privacy-related questions, please use the contact
+            information provided on the Maze Rush Contact Us page.
           </p>
         </div>
 
