@@ -12,7 +12,7 @@ const completedCount = (save: SaveData, d: Diff) => Object.keys(save.best).filte
 const nextLevelFor = (save: SaveData, d: Diff) => Math.min(save.unlocked[d], LEVELS_PER_DIFF);
 
 // ------------------------------------------------------------------ MAIN MENU
-export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout, onPrivacy, onTerms }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout?: () => void; onPrivacy?: () => void; onTerms?: () => void }) {
+export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, onHelp, onAbout, onPrivacy, onTerms, onHelpCenter }: { save: SaveData; onPlay: () => void; onDifficulty: () => void; onLevels: () => void; onSettings: () => void; onHelp: () => void; onAbout?: () => void; onPrivacy?: () => void; onTerms?: () => void; onHelpCenter?: () => void }) {
   const d = save.settings.difficulty;
   const done = completedCount(save, d);
   const all = save.unlocked[d] > LEVELS_PER_DIFF;
@@ -83,6 +83,10 @@ export function MenuScreen({ save, onPlay, onDifficulty, onLevels, onSettings, o
               <FileText className="h-5 w-5 text-cyan-300" />
               <span className="font-display text-xs font-bold text-white sm:text-sm">TERMS & CONDITIONS</span>
             </button>
+            <button onClick={onHelpCenter} className={`${card} col-span-2 flex items-center justify-center gap-2 px-3 py-3`}>
+  <HelpCircle className="h-5 w-5 text-cyan-300" />
+  <span className="font-display text-xs font-bold text-white sm:text-sm">HELP CENTER</span>
+</button>
           </div>
           <p className="mt-1 text-center text-[11px] text-slate-500 short:hidden">Progress saves automatically in your browser · WASD / Arrows / Swipe / D-Pad</p>
         </div>
@@ -522,4 +526,150 @@ export function TermsScreen({ onBack }: { onBack: () => void }) {
     </Shell>
   );
 }
+// ------------------------------------------------------------------ HELP CENTER
+export function HelpCenterScreen({
+  onBack,
+  onFAQ,
+  onContact,
+  onDisclaimer,
+  onCookiePolicy,
+}: {
+  onBack: () => void;
+  onFAQ: () => void;
+  onContact: () => void;
+  onDisclaimer: () => void;
+  onCookiePolicy: () => void;
+}) {
+  const items = [
+    { title: "FAQ", description: "Find answers to common questions.", icon: HelpCircle, action: onFAQ },
+    { title: "CONTACT US", description: "Learn how to get in touch with us.", icon: Info, action: onContact },
+    { title: "DISCLAIMER", description: "Important information about the game.", icon: FileText, action: onDisclaimer },
+    { title: "COOKIE POLICY", description: "Learn how browser storage and cookies are handled.", icon: ShieldCheck, action: onCookiePolicy },
+  ];
 
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="How can we help you?">HELP CENTER</ScreenTitle>
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.title}
+              onClick={item.action}
+              className={`${card} flex w-full items-center gap-4 p-4 text-left`}
+            >
+              <Icon className="h-6 w-6 shrink-0 text-cyan-300" />
+              <span>
+                <span className="font-display block text-sm font-bold text-white">{item.title}</span>
+                <span className="mt-1 block text-xs text-slate-400">{item.description}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+// ------------------------------------------------------------------ FAQ
+export function FAQScreen({ onBack }: { onBack: () => void }) {
+  const items = [
+    ["What is Maze Rush?", "Maze Rush is a browser-based maze puzzle game with 80 levels across four difficulty modes."],
+    ["Is Maze Rush free to play?", "Yes. You can play Maze Rush for free on our website."],
+    ["How many levels are available?", "There are 80 levels in total: 20 Easy, 20 Normal, 20 Hard, and 20 Impossible."],
+    ["How do I control the player?", "Use WASD keys or the arrow keys. On touch devices, swipe on the maze or use the on-screen controls."],
+    ["How is my progress saved?", "Your game progress and settings are saved locally in your browser."],
+    ["Will my progress transfer to another device?", "No. Progress is stored in your current browser and may not transfer to another device or browser."],
+    ["What happens if I clear my browser data?", "Your saved game progress may be deleted when you clear your browser's site data."],
+    ["How can I contact the developer?", "Please visit the Contact Us section in our Help Center for contact information."],
+  ];
+
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="Answers to common questions about Maze Rush.">FAQ</ScreenTitle>
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+        {items.map(([question, answer]) => (
+          <div key={question} className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-4">
+            <h3 className="font-display text-sm font-bold text-cyan-300">{question}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-300">{answer}</p>
+          </div>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+// ------------------------------------------------------------------ CONTACT US
+export function ContactScreen({ onBack }: { onBack: () => void }) {
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="We appreciate your feedback and questions.">CONTACT US</ScreenTitle>
+      <div className="anim-slide-up mt-4 w-full max-w-xl rounded-2xl border border-cyan-300/30 bg-[#0c1024]/90 p-5 text-center">
+        <Info className="mx-auto h-9 w-9 text-cyan-300" />
+        <p className="mt-4 text-sm leading-relaxed text-slate-300">
+          Our contact information will be available soon. Thank you for your patience.
+        </p>
+      </div>
+    </Shell>
+  );
+}
+
+// ------------------------------------------------------------------ DISCLAIMER
+export function DisclaimerScreen({ onBack }: { onBack: () => void }) {
+  const sections = [
+    ["1. GENERAL INFORMATION", "Maze Rush is a browser-based puzzle game provided for entertainment and personal enjoyment."],
+    ["2. NO GUARANTEE", "We make reasonable efforts to keep the game working properly. However, we do not guarantee that the website or game will always be available, uninterrupted, or error-free."],
+    ["3. GAME PROGRESS", "Game progress is stored in your browser. We are not responsible for progress lost because of browser data removal, device changes, technical problems, or other circumstances beyond our control."],
+    ["4. EXTERNAL SERVICES", "Maze Rush is hosted using Netlify. External services may have their own terms, privacy policies, and data practices."],
+    ["5. USE AT YOUR OWN RISK", "You use the game at your own discretion. Please use a compatible and reasonably secure browser and device."],
+    ["6. CHANGES", "We may update this Disclaimer when necessary. Any changes will be published on this page."],
+  ];
+
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="Important information about using Maze Rush.">DISCLAIMER</ScreenTitle>
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+        <p className="text-xs text-slate-500">Last updated: November 9, 2026</p>
+        {sections.map(([title, body]) => (
+          <div key={title} className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+            <h3 className="font-display text-lg font-bold text-cyan-300">{title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-300">{body}</p>
+          </div>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+// ------------------------------------------------------------------ COOKIE POLICY
+export function CookiePolicyScreen({ onBack }: { onBack: () => void }) {
+  const sections = [
+    ["1. INTRODUCTION", "This Cookie Policy explains how Maze Rush uses browser storage and how information may be stored on your device when you use the game."],
+    ["2. LOCAL STORAGE", "Maze Rush uses your browser's Local Storage to save game progress and settings, such as unlocked levels, scores, sound preferences, and difficulty settings."],
+    ["3. COOKIES", "The game does not currently require account registration or use cookies for its core gameplay. However, hosting or third-party services may use their own technologies."],
+    ["4. MANAGING STORAGE", "You can manage or clear website data through your browser settings. Clearing this data may remove your saved game progress and preferences."],
+    ["5. THIRD-PARTY SERVICES", "Our website is hosted by Netlify. Please review the relevant third-party policies to learn about their use of cookies or similar technologies."],
+    ["6. POLICY UPDATES", "We may update this Cookie Policy as the game or website changes. Updates will be published on this page."],
+  ];
+
+  return (
+    <Shell>
+      <BackButton onClick={onBack} />
+      <ScreenTitle sub="How browser storage and similar technologies work.">COOKIE POLICY</ScreenTitle>
+      <div className="anim-slide-up mt-4 flex w-full max-w-xl flex-col gap-3 pb-4">
+        <p className="text-xs text-slate-500">Last updated: November 9, 2026</p>
+        {sections.map(([title, body]) => (
+          <div key={title} className="rounded-2xl border border-indigo-300/25 bg-[#0c1024]/90 p-5">
+            <h3 className="font-display text-lg font-bold text-cyan-300">{title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-300">{body}</p>
+          </div>
+        ))}
+      </div>
+    </Shell>
+  );
+}
