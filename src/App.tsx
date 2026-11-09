@@ -1,14 +1,42 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GameView } from "./components/GameView";
-import { AboutScreen, DifficultyScreen, HelpScreen, LevelSelectScreen, MenuScreen, SettingsScreen, PrivacyPolicyScreen, TermsScreen } from "./components/Screens";
+import {
+  AboutScreen,
+  DifficultyScreen,
+  HelpScreen,
+  LevelSelectScreen,
+  MenuScreen,
+  SettingsScreen,
+  PrivacyPolicyScreen,
+  TermsScreen,
+  HelpCenterScreen,
+  FAQScreen,
+  ContactScreen,
+  DisclaimerScreen,
+  CookiePolicyScreen,
+} from "./components/Screens";
 import { clampLevel, getLevel } from "./game/levels";
 import { bestKey, clearSave, defaultSave, loadSave, writeSave, type SaveData } from "./game/save";
 import { setSoundEnabled, sfx } from "./game/audio";
 import type { Result } from "./game/engine";
 import { DIFFS, LEVELS_PER_DIFF, type Diff } from "./game/types";
 
-type Screen = "menu" | "difficulty" | "levels" | "settings" | "help" | "game" | "about" | "privacy" | "terms";
+type Screen =
+  | "menu"
+  | "difficulty"
+  | "levels"
+  | "settings"
+  | "help"
+  | "game"
+  | "about"
+  | "privacy"
+  | "terms"
+  | "helpCenter"
+  | "faq"
+  | "contact"
+  | "disclaimer"
+  | "cookiePolicy";
 
 function useTouchMode(pref: "auto" | "on" | "off") {
   const compute = () => {
@@ -85,12 +113,15 @@ export default function App() {
       />
     );
   }
+
   if (screen === "difficulty") {
     return <DifficultyScreen save={save} onBack={() => setScreen("menu")} onPick={(d) => { setDifficulty(d); setScreen("levels"); }} />;
   }
+
   if (screen === "levels") {
     return <LevelSelectScreen save={save} onBack={() => setScreen("menu")} onDifficulty={setDifficulty} onPick={startLevel} />;
   }
+
   if (screen === "settings") {
     return (
       <SettingsScreen
@@ -101,10 +132,28 @@ export default function App() {
       />
     );
   }
+
   if (screen === "help") return <HelpScreen onBack={() => setScreen("menu")} />;
   if (screen === "about") return <AboutScreen onBack={() => setScreen("menu")} />;
   if (screen === "privacy") return <PrivacyPolicyScreen onBack={() => setScreen("menu")} />;
   if (screen === "terms") return <TermsScreen onBack={() => setScreen("menu")} />;
+
+  if (screen === "helpCenter") {
+    return (
+      <HelpCenterScreen
+        onBack={() => setScreen("menu")}
+        onFAQ={() => setScreen("faq")}
+        onContact={() => setScreen("contact")}
+        onDisclaimer={() => setScreen("disclaimer")}
+        onCookiePolicy={() => setScreen("cookiePolicy")}
+      />
+    );
+  }
+
+  if (screen === "faq") return <FAQScreen onBack={() => setScreen("helpCenter")} />;
+  if (screen === "contact") return <ContactScreen onBack={() => setScreen("helpCenter")} />;
+  if (screen === "disclaimer") return <DisclaimerScreen onBack={() => setScreen("helpCenter")} />;
+  if (screen === "cookiePolicy") return <CookiePolicyScreen onBack={() => setScreen("helpCenter")} />;
 
   return (
     <MenuScreen
@@ -117,6 +166,7 @@ export default function App() {
       onAbout={() => setScreen("about")}
       onPrivacy={() => setScreen("privacy")}
       onTerms={() => setScreen("terms")}
+      onHelpCenter={() => setScreen("helpCenter")}
     />
   );
 }
